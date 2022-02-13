@@ -1,6 +1,6 @@
 # ai-atln
-# ai project 0
-# Trey 
-# Leah
-# Ashley
-# Nathan
+# AI Project0
+Trey 
+Leah
+Ashley
+Nathan
