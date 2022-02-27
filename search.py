@@ -39,8 +39,7 @@ class SearchProblem:
 
         Returns True if and only if the state is a valid goal state.
         """
-        (x,y) = state.getPosition()
-        return hasFood(x,y)
+        util.raiseNotDefined()
 
     def getSuccessors(self, state):
         """
@@ -88,20 +87,17 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    from util import Stack
-    fringe = Stack()
-    visited = {}
-    fringe.push((problem.getStartState(), [problem.getStartState()]))
+    fringe = util.Stack()
+    visited = []
+    fringe.push((problem.getStartState(), list()))
     while fringe:
         (v, path) = fringe.pop()
         if v not in visited:
-            if isGoalState(v):
+            if problem.isGoalState(v):
                 return path
-            visited.add(v)
-            for node in getSuccessors(v):
-                fringe.push((node, node + [path]))
-
-
+            visited.append(v)
+            for child,direction,cost in problem.getSuccessors(v):
+                fringe.push((child, path + [direction]))
 
 
 def breadthFirstSearch(problem):
