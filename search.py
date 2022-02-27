@@ -83,8 +83,7 @@ def depthFirstSearch(problem):
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
 
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+print("Start:", problem.getStartState())
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
@@ -110,9 +109,17 @@ def breadthFirstSearch(problem):
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
-    """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    fringe = util.PriorityQueue()
+    visited = []
+    fringe.push((problem.getStartState(), list()), 0)
+    while fringe:
+        (v, path) = fringe.pop()
+        if v not in visited:
+            if problem.isGoalState(v):
+                return path
+            visited.append(v)
+            for child,direction,cost in problem.getSuccessors(v):
+                fringe.push((child, path + [direction]), problem.getCostOfActions(path + [direction]))
 
 def nullHeuristic(state, problem=None):
     """
