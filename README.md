@@ -1,5 +1,5 @@
 # AI Project0
-Trey 
-Leah
-Ashley Breu
-Nathan
+Trey Lisauckis
+Leah McIntyre
+Ashley
+Nathan Early
