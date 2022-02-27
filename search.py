@@ -88,14 +88,14 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
     fringe = util.Stack()
-    visited = []
+    visited = set()
     fringe.push((problem.getStartState(), list()))
     while fringe:
         (v, path) = fringe.pop()
         if v not in visited:
             if problem.isGoalState(v):
                 return path
-            visited.append(v)
+            visited.add(v)
             for child,direction,cost in problem.getSuccessors(v):
                 fringe.push((child, path + [direction]))
 
