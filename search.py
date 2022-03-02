@@ -101,8 +101,6 @@ def depthFirstSearch(problem):
 
 
 def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
     fringe = util.Queue()
     visited = []
     fringe.push((problem.getStartState(), list()))
@@ -114,6 +112,11 @@ def breadthFirstSearch(problem):
             visited.append(v)
             for child,direction,cost in problem.getSuccessors(v):
                 fringe.push((child, path + [direction]))
+
+
+    
+
+    
 
 def uniformCostSearch(problem):
     fringe = util.PriorityQueue()
@@ -141,17 +144,38 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     "*** YOUR CODE HERE ***"
     fringe = util.PriorityQueue()
     visited = []
-    fringe.push((problem.getStartState(), list()), 0)
+    startNode = (problem.getStartState(), list(), 0)
+    fringe.push(startNode, 0)
+    while fringe:
+        (v, path, oldCost) = fringe.pop()
+        if problem.isGoalState(v):
+            return path
+        if v not in visited:
+            visited.append(v)
+            children = problem.getSuccessors(v)
+            for child,direction,newCost in children:
+                childCost = oldCost + newCost
+                newNode = (child, path + [direction], childCost)
+                fringe.push(newNode, childCost + heuristic(child, problem))
+    return []
+
+"""
+def aStarSearch(problem, heuristic=nullHeuristic):
+   
+    fringe = util.PriorityQueue()
+    visited = []
+    fringe.push((problem.getStartState(), list()), heuristic(problem.getStartState(), problem))
     while fringe:
         (v, path) = fringe.pop()
         if v not in visited:
+            visited.append(v)
             if problem.isGoalState(v):
                 return path
-            visited.append(v)
             for child,direction,cost in problem.getSuccessors(v):
-                cost = problem.getCostOfActions(path + [direction]) + heuristic(v,problem)
-                fringe.push((child, path + [direction]), cost)
-
+                new_cost = problem.getCostOfActions(path + [direction]) + heuristic(v,problem)
+                fringe.push((child, path + [direction]), new_cost)
+    return []
+"""
 
 
 
