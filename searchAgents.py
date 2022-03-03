@@ -454,7 +454,27 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+
+    #lists location (x,y) of all food pellets
+    foodList = foodGrid.asList()
+
+    #if there is no food left, return 0 (heuristic for goal node should be 0)
+    if len(foodList) == 0:
+        return 0
+    
+    
+    food_distances = []
+
+    for foodPosition in foodList:
+        #gets distance from pacman to food pellet, adds to list
+        food_distances.append(mazeDistance(position, foodPosition, problem.startingGameState))
+
+    #another check to make sure we are not at goal node
+    if len(food_distances) == 0:
+        return 0
+
+    #returns the max distance, so returns the distance to the furthest pellet, so it will never overestimate distance 
+    return max(food_distances)
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -484,7 +504,7 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
-        "*** YOUR CODE HERE ***"
+        return search.aStarSearch(problem)
         util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -520,8 +540,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         """
         x,y = state
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return ((x,y) in self.food.asList())
 
 def mazeDistance(point1, point2, gameState):
     """
