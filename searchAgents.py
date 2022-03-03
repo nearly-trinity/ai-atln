@@ -473,7 +473,8 @@ def foodHeuristic(state, problem):
     if len(food_distances) == 0:
         return 0
 
-    #returns the max distance, so returns the distance to the furthest pellet, so it will never overestimate distance 
+    #returns the max distance, so returns the distance to the furthest pellet
+    # will always return distance to furthest pellet, so will never overestimate 
     return max(food_distances)
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -504,6 +505,7 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
+        #searches with the goal of finding any food position, will stop when finds the closest one
         return search.aStarSearch(problem)
         util.raiseNotDefined()
 
