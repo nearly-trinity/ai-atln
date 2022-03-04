@@ -288,6 +288,7 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        self.startingGameState = startingGameState
 
     def getStartState(self):
         """
@@ -295,14 +296,21 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return (self.startingPosition, [])
+        #util.raiseNotDefined()
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        xy = state[0]
+        visitedCorners = state[1]
+        if xy in self.corners:
+            if not xy in visitedCorners:
+                visitedCorners.append(xy)
+            return len(visitedCorners) == 4
+        return False
 
     def getSuccessors(self, state):
         """
@@ -325,6 +333,19 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x,y = state[0]
+            visitedCorners = state[1]
+            dx,dy = Actions.directionToVector(action)
+            nextx,nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if not hitsWall:
+                sucCorners = list(visitedCorners)
+                next = (nextx, nexty)
+                if next in self.corners:
+                    if not next in sucCorners:
+                        sucCorners.append(next)
+                succ = ((next, sucCorners), action, 1)
+                successors.append(succ)
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -360,7 +381,17 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    xy = state[0]
+    visitedCorners = state[1]
+    unvisited = []
+    for corner in corners:
+        if not ( corner in visitedCorners):
+            unvisited.append(corner)
+    
+    heuristic = [0]
+    for corner in unvisitedCorners:
+        heuristic.append(mazeDistance(xy, corner, problem.startingGameState))
+    return max(heuristic)
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
