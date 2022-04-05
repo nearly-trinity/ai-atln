@@ -134,7 +134,6 @@ class QLearningAgent(ReinforcementAgent):
         currentQValue = self.getQValue(state, action)
         nextStateQValue = self.computeValueFromQValues(nextState)
         self.qvalue[(state, action)] = currentQValue + self.alpha * (reward + (self.discount * nextStateQValue) - currentQValue)
-        print(self.qvalue[(state,action)])
 
         #util.raiseNotDefined()
 
@@ -198,15 +197,37 @@ class ApproximateQAgent(PacmanQAgent):
           Should return Q(state,action) = w * featureVector
           where * is the dotProduct operator
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        #weights = self.getWeights
+        featureVector = self.featExtractor.getFeatures(state, action)
+        qValue = 0
+        
+        for feature in featureVector.keys():
+         # print(feature)
+          qValue += self.weights[feature] * featureVector[feature]
+        #return np.dot(weights[feature],feature)
+        return qValue
+        
+        #util.raiseNotDefined()
 
     def update(self, state, action, nextState, reward):
         """
            Should update your weights based on transition
+            currentQValue = self.getQValue(state, action)
+        nextStateQValue = self.computeValueFromQValues(nextState)
+        self.qvalue[(state, action)] = currentQValue + self.alpha * (reward + (self.discount * nextStateQValue) - currentQValue)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        featureVector = self.featExtractor.getFeatures(state, action)
+       # weights = self.getWeights
+        currentQValue = self.getQValue(state, action)
+        nextStateQValue = self.computeValueFromQValues(nextState)
+
+        difference = reward + (self.discount * nextStateQValue) - currentQValue
+        for feature in featureVector.keys():
+          self.weights[feature] = self.weights[feature] + (self.alpha * difference * featureVector[feature])
+        
+        #self.qvalue[(state, action)] = currentQValue + self.alpha * (reward + (self.discount * nextStateQValue)- currentQValue)
+        #util.raiseNotDefined()
 
     def final(self, state):
         "Called at the end of each game."
