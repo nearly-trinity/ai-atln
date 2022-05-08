@@ -56,6 +56,16 @@ class RegressionModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
+        self.batch_size = 25
+        self.num_neurons_hidden_layer = 50
+
+        # layer 1
+        self.w_1 = nn.Parameter(1, self.num_neurons_hidden_layer)  # weight vector 1
+        self.b_1 = nn.Parameter(1, self.num_neurons_hidden_layer)  # bias vector 1
+
+        # output layer
+        self.output_w = nn.Parameter(self.num_neurons_hidden_layer, 1)
+        self.output_b = nn.Parameter(1, 1)
 
     def run(self, x):
         """
@@ -67,6 +77,23 @@ class RegressionModel(object):
             A node with shape (batch_size x 1) containing predicted y-values
         """
         "*** YOUR CODE HERE ***"
+        # Calculate layer 1 weights
+        trans_1 = nn.Linear(x,self.w_1)
+
+        # Calculate layer 1 weights with biases
+        trans_1_bias = nn.AddBias(trans_1, self.b_1)
+
+        # Convert to ReLU
+        relu_1 = nn.ReLU(trans_1_bias);
+        
+        # Use ReLU to compute output weight
+        trans_2 = nn.Linear(relu_1, self.output_w)
+
+        # Get output weights with biases 
+        trans_2_bias = nn.AddBias(trans_2, self.output_b)
+
+        # Return output unit
+        return trans_2_bias
 
     def get_loss(self, x, y):
         """
@@ -79,12 +106,50 @@ class RegressionModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        # creates the predictions for y (yhat)
+        yhat = self.run(x)
+
+        # calculates the error rate (mean squared error) of the predictions vs the true values 
+        return nn.SquareLoss(yhat, y)
 
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+        # initial learning rate
+        adjusted_rate = -0.2
+
+        # loop for performing gradient updates
+        while 1 == 1:
+            for row_vect, label in dataset.iterate_once(self.batch_size):
+
+                # calculate loss using the information from the dataset 
+                loss = self.get_loss(row_vect, label)
+
+                # creates a list of the layer parameters
+                params = [self.w_1, self.b_1, self.output_w, self.output_b]
+                
+                # calculates gradients using the loss and the parameters
+                gradients = nn.gradients(loss, params)
+
+                learning_rate = min(-0.01, adjusted_rate)
+
+                # Compute updates with the new learning rate
+                self.w_1.update(gradients[0], learning_rate)
+                self.output_w.update(gradients[2], learning_rate)
+                self.b_1.update(gradients[1], learning_rate)
+                self.output_b.update(gradients[3], learning_rate)
+
+            # update learning rate
+            adjusted_rate += .02
+
+            # recalculate true loss
+            loss = self.get_loss(nn.Constant(dataset.x), nn.Constant(dataset.y))
+            
+            # break loop when error rate is low enough
+            if nn.as_scalar(loss) < 0.008:
+                return
 
 class DigitClassificationModel(object):
     """
