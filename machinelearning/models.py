@@ -167,7 +167,25 @@ class DigitClassificationModel(object):
     """
     def __init__(self):
         # Initialize your model parameters here
-        "*** YOUR CODE HERE ***"
+        
+        #set hyperparameters
+        self.batch_size = 100
+        self.hidden_layer_size = 100
+        self.learning_rate = - 0.5
+        self.number_hidden_layers = 2
+
+        #initialize weights and bias for first layer of input 
+        self.w_1 = nn.Parameter(784, self.hidden_layer_size)
+        self.b_1 = nn.Parameter(1, self.hidden_layer_size) # 1 bias value goes into each of the nodes in the hidden layer
+
+        #initialize weights and bias for 2nd layer of input
+        self.w_2 = nn.Parameter(self.hidden_layer_size, self.hidden_layer_size) #size of input x size of output (both size of hidden layer)
+        self.b_2 = nn.Parameter(1, self.hidden_layer_size) 
+
+        #initialize weights and bias for 3rd layer (output)
+        self.w_3 = nn.Parameter(self.hidden_layer_size, 10) #size of input (hidden layer) x size of output (10)
+        self.b_3 = nn.Parameter(1, 10)
+
 
     def run(self, x):
         """
@@ -185,6 +203,26 @@ class DigitClassificationModel(object):
         """
         "*** YOUR CODE HERE ***"
 
+        #calculations layer 1
+        xw_1 = nn.Linear(x, self.w_1) #matrix multiplication of features x weights 
+        xw_1_b = nn.AddBias(xw_1, self.b_1) #add in bias
+        ReLU_1 = nn.ReLU(xw_1_b) #perform activation function (ReLU)
+
+        #calculations layer 2, output from layer 1 as input
+        xw_2 = nn.Linear(ReLU_1, self.w_2)
+        xw_2_b = nn.AddBias(xw_2, self.b_2)
+        ReLU_2 = nn.ReLU(xw_2_b)
+
+        #calculation layer 3 (last layer, no ReLU)
+        xw_3 = nn.Linear(ReLU_2, self.w_3) 
+        xw_3_b = nn.AddBias(xw_3, self.b_3)
+
+
+        return xw_3_b
+
+
+
+
     def get_loss(self, x, y):
         """
         Computes the loss for a batch of examples.
@@ -199,12 +237,42 @@ class DigitClassificationModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        predicted_y = self.run(x)
+
+        #calculates a batched softmax loss 
+        loss = nn.SoftmaxLoss(predicted_y, y)
+
+        return loss
 
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+
+        training = True
+
+        while training:
+
+            for input, output in dataset.iterate_once(self.batch_size):
+
+                loss = self.get_loss(input, output)
+                print(loss)
+                #takes in loss and parameters, returns loss for each parameter 
+                grad_w1, grad_b1, grad_w2, grad_b2, grad_w3, grad_b3 = nn.gradients(loss, [self.w_1, self.b_1, self.w_2, self.b_2, self.w_3, self.b_3]) 
+
+                #updates parameters using direction (gradients) and multiplier (learning rate)
+                self.w_1.update(grad_w1, self.learning_rate)
+                self.b_1.update(grad_b1, self.learning_rate)
+                self.w_2.update(grad_w2, self.learning_rate)
+                self.b_2.update(grad_b2, self.learning_rate)
+                self.w_3.update(grad_w3, self.learning_rate)
+                self.b_3.update(grad_b3, self.learning_rate)
+            
+            accuracy = dataset.get_validation_accuracy()
+            if accuracy >= .975:
+                return
+
 
 class LanguageIDModel(object):
     """
