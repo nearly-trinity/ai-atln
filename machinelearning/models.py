@@ -60,10 +60,8 @@ class RegressionModel(object):
         self.num_neurons_hidden_layer = 50
 
         # layer 1
-        self.w_1 = nn.Parameter(
-            1, self.num_neurons_hidden_layer)  # weight vector 1
-        self.b_1 = nn.Parameter(
-            1, self.num_neurons_hidden_layer)  # bias vector 1
+        self.w_1 = nn.Parameter(1, self.num_neurons_hidden_layer)  # weight vector 1
+        self.b_1 = nn.Parameter(1, self.num_neurons_hidden_layer)  # bias vector 1
 
         # output layer
         self.output_w = nn.Parameter(self.num_neurons_hidden_layer, 1)
