@@ -149,7 +149,7 @@ class RegressionModel(object):
                                  nn.Constant(dataset.y))
 
             # break loop when error rate is low enough
-            if nn.as_scalar(loss) < 0.008:
+            if nn.as_scalar(loss) < 0.01:
                 return
 
 
@@ -340,7 +340,7 @@ class LanguageIDModel(object):
             if i == 0:
                 zIfZero = nn.AddBias(nn.Linear(xs[i],self.w_1), self.b_1)
                 activation = nn.ReLU(zIfZero)
-                hidden = nn.AddBias(nn.Linear(activation,self.w_2), self.b_2))
+                hidden = nn.AddBias(nn.Linear(activation,self.w_2), self.b_2)
             else:
                 z = nn.ReLU(nn.Add(nn.Linear(xs[i],self.w_1), nn.Linear(hidden, self.w_1_hidden)))
                 hidden = nn.ReLU(nn.AddBias(nn.Linear(z ,self.w_2_hidden),self.b_2_hidden))
