@@ -291,7 +291,17 @@ class LanguageIDModel(object):
 
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
-
+	   
+        self.w_1 = nn.Parameter(self.num_chars, 100)
+	    self.b_1 = nn.Parameter(100,1)
+	    self.w_2 = nn.Parameter(100,100)
+	    self.b_2 = nn.Parameter(1,100)
+	    self.w_1_hidden = nn.Parameter(100, 100)
+        self.b_1_hidden = nn.Parameter(100,1)
+        self.w_2_hidden = nn.Parameter(100,100)
+        self.b_2_hidden = nn.Parameter(1,100)
+	    self.w_end = nn.Parameter(100,2)
+	    self.b_end = nn.Parameter(1,2)
 
     def run(self, xs):
         """
