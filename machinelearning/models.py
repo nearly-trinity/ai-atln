@@ -340,12 +340,12 @@ class LanguageIDModel(object):
         "*** YOUR CODE HERE ***"
         for i in range(len(xs)):
             if i == 0:
-                    zIfZero = nn.AddBias(nn.Linear(xs[i],self.w_1), self.b_1)
-                    activation = nn.ReLU(zIfZero)
-                    hidden = nn.AddBias(nn.Linear(activation,self.w_2), self.b_2)
+                zIfZero = nn.AddBias(nn.Linear(xs[i],self.w_1), self.b_1)
+                activation = nn.ReLU(zIfZero)
+                hidden = nn.AddBias(nn.Linear(activation,self.w_2), self.b_2)
             else:
-                    z = nn.Add(nn.Linear(xs[i],self.w_1), nn.Linear(hidden, self.w_1_hidden))
-                    hidden = nn.ReLU(nn.AddBias(z,self.b_1))
+                z = nn.Add(nn.Linear(xs[i],self.w_1), nn.Linear(hidden, self.w_1_hidden))
+                hidden = nn.ReLU(nn.AddBias(z,self.b_1))
 
     def get_loss(self, xs, y):
         """
@@ -362,6 +362,8 @@ class LanguageIDModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        return nn.SoftmaxLoss(self.run(xs), y)
+
 
     def train(self, dataset):
         """
