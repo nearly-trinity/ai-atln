@@ -1,5 +1,6 @@
 import nn
 
+
 class PerceptronModel(object):
     def __init__(self, dimensions):
         """
@@ -24,7 +25,7 @@ class PerceptronModel(object):
             x: a node with shape (1 x dimensions)
         Returns: a node containing a single number (the score)
         """
-        return nn.DotProduct(x,self.get_weights())
+        return nn.DotProduct(x, self.get_weights())
 
     def get_prediction(self, x):
         """
@@ -32,27 +33,26 @@ class PerceptronModel(object):
         Returns: 1 or -1
         """
         "*** YOUR CODE HERE ***"
-        y = self.run(x)
-        if nn.as_scalar(y)<0:
-            return -1
-        else:
-            return 1
+        dotProd = nn.as_scalar(self.run(x))
+        return -1 if dotProd < 0 else 1
 
     def train(self, dataset):
-        f=1
-        while f==1:
-            f=0
+        loop = True
+        while loop:
+            loop = False
             for x, y in dataset.iterate_once(1):
                 if self.get_prediction(x) != nn.as_scalar(y):
-                    nn.Parameter.update(self.w,x,nn.as_scalar(y))
-                    f=1
-            
+                    nn.Parameter.update(self.w, x, nn.as_scalar(y))
+                    loop = True
+
+
 class RegressionModel(object):
     """
     A neural network model for approximating a function that maps from real
     numbers to real numbers. The network should be sufficiently large to be able
     to approximate sin(x) on the interval [-2pi, 2pi] to reasonable precision.
     """
+
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
@@ -60,8 +60,10 @@ class RegressionModel(object):
         self.num_neurons_hidden_layer = 50
 
         # layer 1
-        self.w_1 = nn.Parameter(1, self.num_neurons_hidden_layer)  # weight vector 1
-        self.b_1 = nn.Parameter(1, self.num_neurons_hidden_layer)  # bias vector 1
+        self.w_1 = nn.Parameter(
+            1, self.num_neurons_hidden_layer)  # weight vector 1
+        self.b_1 = nn.Parameter(
+            1, self.num_neurons_hidden_layer)  # bias vector 1
 
         # output layer
         self.output_w = nn.Parameter(self.num_neurons_hidden_layer, 1)
@@ -78,18 +80,18 @@ class RegressionModel(object):
         """
         "*** YOUR CODE HERE ***"
         # Calculate layer 1 weights
-        trans_1 = nn.Linear(x,self.w_1)
+        trans_1 = nn.Linear(x, self.w_1)
 
         # Calculate layer 1 weights with biases
         trans_1_bias = nn.AddBias(trans_1, self.b_1)
 
         # Convert to ReLU
-        relu_1 = nn.ReLU(trans_1_bias);
-        
+        relu_1 = nn.ReLU(trans_1_bias)
+
         # Use ReLU to compute output weight
         trans_2 = nn.Linear(relu_1, self.output_w)
 
-        # Get output weights with biases 
+        # Get output weights with biases
         trans_2_bias = nn.AddBias(trans_2, self.output_b)
 
         # Return output unit
@@ -109,7 +111,7 @@ class RegressionModel(object):
         # creates the predictions for y (yhat)
         yhat = self.run(x)
 
-        # calculates the error rate (mean squared error) of the predictions vs the true values 
+        # calculates the error rate (mean squared error) of the predictions vs the true values
         return nn.SquareLoss(yhat, y)
 
     def train(self, dataset):
@@ -124,12 +126,12 @@ class RegressionModel(object):
         while 1 == 1:
             for row_vect, label in dataset.iterate_once(self.batch_size):
 
-                # calculate loss using the information from the dataset 
+                # calculate loss using the information from the dataset
                 loss = self.get_loss(row_vect, label)
 
                 # creates a list of the layer parameters
                 params = [self.w_1, self.b_1, self.output_w, self.output_b]
-                
+
                 # calculates gradients using the loss and the parameters
                 gradients = nn.gradients(loss, params)
 
@@ -145,11 +147,13 @@ class RegressionModel(object):
             adjusted_rate += .02
 
             # recalculate true loss
-            loss = self.get_loss(nn.Constant(dataset.x), nn.Constant(dataset.y))
-            
+            loss = self.get_loss(nn.Constant(dataset.x),
+                                 nn.Constant(dataset.y))
+
             # break loop when error rate is low enough
             if nn.as_scalar(loss) < 0.008:
                 return
+
 
 class DigitClassificationModel(object):
     """
@@ -165,27 +169,30 @@ class DigitClassificationModel(object):
     methods here. We recommend that you implement the RegressionModel before
     working on this part of the project.)
     """
+
     def __init__(self):
         # Initialize your model parameters here
-        
-        #set hyperparameters
+
+        # set hyperparameters
         self.batch_size = 100
         self.hidden_layer_size = 100
         self.learning_rate = - 0.5
         self.number_hidden_layers = 2
 
-        #initialize weights and bias for first layer of input 
+        # initialize weights and bias for first layer of input
         self.w_1 = nn.Parameter(784, self.hidden_layer_size)
-        self.b_1 = nn.Parameter(1, self.hidden_layer_size) # 1 bias value goes into each of the nodes in the hidden layer
+        # 1 bias value goes into each of the nodes in the hidden layer
+        self.b_1 = nn.Parameter(1, self.hidden_layer_size)
 
-        #initialize weights and bias for 2nd layer of input
-        self.w_2 = nn.Parameter(self.hidden_layer_size, self.hidden_layer_size) #size of input x size of output (both size of hidden layer)
-        self.b_2 = nn.Parameter(1, self.hidden_layer_size) 
+        # initialize weights and bias for 2nd layer of input
+        # size of input x size of output (both size of hidden layer)
+        self.w_2 = nn.Parameter(self.hidden_layer_size, self.hidden_layer_size)
+        self.b_2 = nn.Parameter(1, self.hidden_layer_size)
 
-        #initialize weights and bias for 3rd layer (output)
-        self.w_3 = nn.Parameter(self.hidden_layer_size, 10) #size of input (hidden layer) x size of output (10)
+        # initialize weights and bias for 3rd layer (output)
+        # size of input (hidden layer) x size of output (10)
+        self.w_3 = nn.Parameter(self.hidden_layer_size, 10)
         self.b_3 = nn.Parameter(1, 10)
-
 
     def run(self, x):
         """
@@ -203,25 +210,22 @@ class DigitClassificationModel(object):
         """
         "*** YOUR CODE HERE ***"
 
-        #calculations layer 1
-        xw_1 = nn.Linear(x, self.w_1) #matrix multiplication of features x weights 
-        xw_1_b = nn.AddBias(xw_1, self.b_1) #add in bias
-        ReLU_1 = nn.ReLU(xw_1_b) #perform activation function (ReLU)
+        # calculations layer 1
+        # matrix multiplication of features x weights
+        xw_1 = nn.Linear(x, self.w_1)
+        xw_1_b = nn.AddBias(xw_1, self.b_1)  # add in bias
+        ReLU_1 = nn.ReLU(xw_1_b)  # perform activation function (ReLU)
 
-        #calculations layer 2, output from layer 1 as input
+        # calculations layer 2, output from layer 1 as input
         xw_2 = nn.Linear(ReLU_1, self.w_2)
         xw_2_b = nn.AddBias(xw_2, self.b_2)
         ReLU_2 = nn.ReLU(xw_2_b)
 
-        #calculation layer 3 (last layer, no ReLU)
-        xw_3 = nn.Linear(ReLU_2, self.w_3) 
+        # calculation layer 3 (last layer, no ReLU)
+        xw_3 = nn.Linear(ReLU_2, self.w_3)
         xw_3_b = nn.AddBias(xw_3, self.b_3)
 
-
         return xw_3_b
-
-
-
 
     def get_loss(self, x, y):
         """
@@ -239,7 +243,7 @@ class DigitClassificationModel(object):
         "*** YOUR CODE HERE ***"
         predicted_y = self.run(x)
 
-        #calculates a batched softmax loss 
+        # calculates a batched softmax loss
         loss = nn.SoftmaxLoss(predicted_y, y)
 
         return loss
@@ -257,17 +261,18 @@ class DigitClassificationModel(object):
             for input, output in dataset.iterate_once(self.batch_size):
 
                 loss = self.get_loss(input, output)
-                #takes in loss and parameters, returns loss for each parameter 
-                grad_w1, grad_b1, grad_w2, grad_b2, grad_w3, grad_b3 = nn.gradients(loss, [self.w_1, self.b_1, self.w_2, self.b_2, self.w_3, self.b_3]) 
+                # takes in loss and parameters, returns loss for each parameter
+                grad_w1, grad_b1, grad_w2, grad_b2, grad_w3, grad_b3 = nn.gradients(
+                    loss, [self.w_1, self.b_1, self.w_2, self.b_2, self.w_3, self.b_3])
 
-                #updates parameters using direction (gradients) and multiplier (learning rate)
+                # updates parameters using direction (gradients) and multiplier (learning rate)
                 self.w_1.update(grad_w1, self.learning_rate)
                 self.b_1.update(grad_b1, self.learning_rate)
                 self.w_2.update(grad_w2, self.learning_rate)
                 self.b_2.update(grad_b2, self.learning_rate)
                 self.w_3.update(grad_w3, self.learning_rate)
                 self.b_3.update(grad_b3, self.learning_rate)
-            
+
             accuracy = dataset.get_validation_accuracy()
             if accuracy >= .975:
                 return
@@ -281,6 +286,7 @@ class LanguageIDModel(object):
     methods here. We recommend that you implement the RegressionModel before
     working on this part of the project.)
     """
+
     def __init__(self):
         # Our dataset contains words from five different languages, and the
         # combined alphabets of the five languages contain a total of 47 unique
@@ -291,17 +297,17 @@ class LanguageIDModel(object):
 
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
-	   
+
         self.w_1 = nn.Parameter(self.num_chars, 100)
-	    self.b_1 = nn.Parameter(100,1)
-	    self.w_2 = nn.Parameter(100,100)
-	    self.b_2 = nn.Parameter(1,100)
-	    self.w_1_hidden = nn.Parameter(100, 100)
-        self.b_1_hidden = nn.Parameter(100,1)
-        self.w_2_hidden = nn.Parameter(100,100)
-        self.b_2_hidden = nn.Parameter(1,100)
-	    self.w_end = nn.Parameter(100,2)
-	    self.b_end = nn.Parameter(1,2)
+        self.b_1 = nn.Parameter(100, 1)
+        self.w_2 = nn.Parameter(100, 100)
+        self.b_2 = nn.Parameter(1, 100)
+        self.w_1_hidden = nn.Parameter(100, 100)
+        self.b_1_hidden = nn.Parameter(100, 1)
+        self.w_2_hidden = nn.Parameter(100, 100)
+        self.b_2_hidden = nn.Parameter(1, 100)
+        self.w_end = nn.Parameter(100, 2)
+        self.b_end = nn.Parameter(1, 2)
 
     def run(self, xs):
         """
