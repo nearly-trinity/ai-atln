@@ -257,7 +257,6 @@ class DigitClassificationModel(object):
             for input, output in dataset.iterate_once(self.batch_size):
 
                 loss = self.get_loss(input, output)
-                print(loss)
                 #takes in loss and parameters, returns loss for each parameter 
                 grad_w1, grad_b1, grad_w2, grad_b2, grad_w3, grad_b3 = nn.gradients(loss, [self.w_1, self.b_1, self.w_2, self.b_2, self.w_3, self.b_3]) 
 
@@ -292,16 +291,7 @@ class LanguageIDModel(object):
 
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
-	self.w_1 = nn.Parameter(self.num_chars, 100)
-	self.b_1 = nn.Parameter(100,1)
-	self.w_2 = nn.Parameter(100,100)
-	self.b_2 = nn.Parameter(1,100)
-	self.w_1_hidden = nn.Parameter(100, 100)
-        self.b_1_hidden = nn.Parameter(100,1)
-        self.w_2_hidden = nn.Parameter(100,100)
-        self.b_2_hidden = nn.Parameter(1,100)
-	self.w_end = nn.Parameter(100,2)
-	self.b_end = nn.Parameter(1,2)
+
 
     def run(self, xs):
         """
