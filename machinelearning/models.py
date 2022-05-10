@@ -272,7 +272,6 @@ class DigitClassificationModel(object):
             if accuracy >= .975:
                 return
 
-
 class LanguageIDModel(object):
     """
     A model for language identification at a single-word granularity.
@@ -291,17 +290,15 @@ class LanguageIDModel(object):
 
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
-	   
         self.w_1 = nn.Parameter(self.num_chars, 100)
-	    self.b_1 = nn.Parameter(100,1)
-	    self.w_2 = nn.Parameter(100,100)
-	    self.b_2 = nn.Parameter(1,100)
-	    self.w_1_hidden = nn.Parameter(100, 100)
+        self.b_1 = nn.Parameter(100,1)
+        self.w_2 = nn.Parameter(100,100)
+        self.b_2 = nn.Parameter(1,100)
+        self.w_1_hidden = nn.Parameter(100, 100)
         self.b_1_hidden = nn.Parameter(100,1)
         self.w_2_hidden = nn.Parameter(100,100)
         self.b_2_hidden = nn.Parameter(1,100)
-	    self.w_end = nn.Parameter(100,2)
-	    self.b_end = nn.Parameter(1,2)
+        self.w_end = nn.Parameter(100,2)
 
     def run(self, xs):
         """
@@ -333,6 +330,14 @@ class LanguageIDModel(object):
                 (also called logits)
         """
         "*** YOUR CODE HERE ***"
+	for i in range(len(xs)):
+                if i == 0:
+                        zIfZero = nn.AddBias(nn.Linear(xs[i],self.w_1), self.b_1)
+                        activation = nn.ReLU(zIfZero)
+                        hidden = nn.AddBias(nn.Linear(activation,self.w_2), self.b_2)
+                else:
+                        z = nn.Add(nn.Linear(xs[i],self.w_1), nn.Linear(hidden, self.w_1_hidden))
+                        hidden = nn.ReLU(nn.AddBias(z,self.b_1)
 
     def get_loss(self, xs, y):
         """
