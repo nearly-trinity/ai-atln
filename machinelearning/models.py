@@ -370,24 +370,25 @@ class LanguageIDModel(object):
         """
         "*** YOUR CODE HERE ***"
         batchSize = 100
+        learningRate = -0.15
         iteration = 0
         accuracy = float(0)
-        while accuracy < .85 and iteration < 40:
+        while accuracy < .85 and iteration < 2:
             iteration += 1
             # update every layer of biases and weights, hidden or otherwise
             for x,y in dataset.iterate_once(batchSize):
                 gradientW1, gradientB1, gradientW2, gradientB2, gradientW1_hidden, gradientB1_hidden, gradientW2_hidden, gradientB2_hidden, gradientWEnd, gradientBEnd \
                 = nn.gradients(self.get_loss(x,y), [self.w_1, self.b_1, self.w_2, self.b_2, self.w_1_hidden, self.b_1_hidden, self.w_2_hidden, self.b_2_hidden, self.w_end, self.b_end])
-                self.w_1.update(gradientW1, -0.15)
-                self.b_1.update(gradientB1, -0.15)
-                self.w_2.update(gradientW2, -0.15)
-                self.b_2.update(gradientB2, -0.15)
-                self.w_1_hidden.update(gradientW1_hidden, -0.15)
-                self.b_1_hidden.update(gradientB1_hidden, -0.15)
-                self.w_2_hidden.update(gradientW2_hidden, -0.15)
-                self.b_2_hidden.update(gradientB2_hidden, -0.15)
-                self.w_end.update(gradientWEnd, -0.15)
-                self.b_end.update(gradientBEnd, -0.15)
+                self.w_1.update(gradientW1, learningRate)
+                self.b_1.update(gradientB1, learningRate)
+                self.w_2.update(gradientW2, learningRate)
+                self.b_2.update(gradientB2, learningRate)
+                self.w_1_hidden.update(gradientW1_hidden, learningRate)
+                self.b_1_hidden.update(gradientB1_hidden, learningRate)
+                self.w_2_hidden.update(gradientW2_hidden, learningRate)
+                self.b_2_hidden.update(gradientB2_hidden, learningRate)
+                self.w_end.update(gradientWEnd, learningRate)
+                self.b_end.update(gradientBEnd, learningRate)
                 accuracy = dataset.get_validation_accuracy()
             
 
