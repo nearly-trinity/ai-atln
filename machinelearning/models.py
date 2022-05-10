@@ -48,7 +48,7 @@ class PerceptronModel(object):
                     f=1
             
 class RegressionModel(object):
-    """
+        """
     A neural network model for approximating a function that maps from real
     numbers to real numbers. The network should be sufficiently large to be able
     to approximate sin(x) on the interval [-2pi, 2pi] to reasonable precision.
@@ -56,6 +56,7 @@ class RegressionModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
+        # initial learning rate
         self.batch_size = 25
         self.num_neurons_hidden_layer = 50
 
@@ -63,8 +64,12 @@ class RegressionModel(object):
         self.w_1 = nn.Parameter(1, self.num_neurons_hidden_layer)  # weight vector 1
         self.b_1 = nn.Parameter(1, self.num_neurons_hidden_layer)  # bias vector 1
 
+        # layer 2
+        self.w_2 = nn.Parameter(self.num_neurons_hidden_layer, int((self.num_neurons_hidden_layer)/2))
+        self.b_2 = nn.Parameter(1, int((self.num_neurons_hidden_layer)/2))
+
         # output layer
-        self.output_w = nn.Parameter(self.num_neurons_hidden_layer, 1)
+        self.output_w = nn.Parameter(int((self.num_neurons_hidden_layer)/2), 1)
         self.output_b = nn.Parameter(1, 1)
 
     def run(self, x):
@@ -87,18 +92,21 @@ class RegressionModel(object):
         relu_1 = nn.ReLU(trans_1_bias);
         
         # Use ReLU to compute output weight
-        trans_2 = nn.Linear(relu_1, self.output_w)
+        trans_2 = nn.Linear(relu_1, self.w_2)
 
         # Get output weights with biases 
-        trans_2_bias = nn.AddBias(trans_2, self.output_b)
+        trans_2_bias = nn.AddBias(trans_2, self.b_2)
 
         # Return output unit
-        return trans_2_bias
+        relu_2 = nn.ReLU(trans_2_bias);
+        trans_3 = nn.Linear(relu_2, self.output_w)
+        trans_3_bias = nn.AddBias(trans_3, self.output_b)
+        return trans_3_bias
 
     def get_loss(self, x, y):
         """
         Computes the loss for a batch of examples.
-``
+
         Inputs:
             x: a node with shape (batch_size x 1)
             y: a node with shape (batch_size x 1), containing the true y-values
@@ -111,14 +119,14 @@ class RegressionModel(object):
 
         # calculates the error rate (mean squared error) of the predictions vs the true values 
         return nn.SquareLoss(yhat, y)
-
+	
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
-        # initial learning rate
-        adjusted_rate = -0.2
+        # init learning rate 
+        learning_rate = -0.01
 
         # loop for performing gradient updates
         while 1 == 1:
@@ -128,29 +136,27 @@ class RegressionModel(object):
                 loss = self.get_loss(row_vect, label)
 
                 # creates a list of the layer parameters
-                params = [self.w_1, self.b_1, self.output_w, self.output_b]
+                params = [self.w_1, self.b_1, self.w_2, self.b_2, self.output_w, self.output_b]
                 
                 # calculates gradients using the loss and the parameters
                 gradients = nn.gradients(loss, params)
 
-                learning_rate = min(-0.01, adjusted_rate)
-
                 # Compute updates with the new learning rate
                 self.w_1.update(gradients[0], learning_rate)
-                self.output_w.update(gradients[2], learning_rate)
+                self.output_w.update(gradients[4], learning_rate)
                 self.b_1.update(gradients[1], learning_rate)
-                self.output_b.update(gradients[3], learning_rate)
-
-            # update learning rate
-            adjusted_rate += .02
+                self.output_b.update(gradients[5], learning_rate)
+                self.w_2.update(gradients[2], learning_rate)
+                self.b_2.update(gradients[3], learning_rate)
 
             # recalculate true loss
             loss = self.get_loss(nn.Constant(dataset.x), nn.Constant(dataset.y))
             
             # break loop when error rate is low enough
-            if nn.as_scalar(loss) < 0.008:
+            if nn.as_scalar(loss) < 0.01:
                 return
-
+	
+	
 class DigitClassificationModel(object):
     """
     A model for handwritten digit classification using the MNIST dataset.
